@@ -52,9 +52,14 @@ spec:
               memory: "3Gi"
               cpu: "2"
           volumeMounts:
-            - name: ${JOB_NAME}
-              mountPath: /var/www/html
+            - name: nextcloud-data
+              mountPath: /var/www/html/data
+            - name: nextcloud-config
+              mountPath: /var/www/html/config
       volumes:
-        - name: ${JOB_NAME}
+        - name: nextcloud-data
           persistentVolumeClaim:
-            claimName: ${JOB_NAME}
+            claimName: nextcloud-data
+        - name: nextcloud-config
+          persistentVolumeClaim:
+            claimName: nextcloud-config
