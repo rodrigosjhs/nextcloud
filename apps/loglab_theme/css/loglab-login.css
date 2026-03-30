@@ -1,0 +1,637 @@
+/**
+ * Log.lab – Tela de login limpa
+ * Uma única caixa, sem bordas duplas, sem sombras em excesso
+ */
+
+#body-login,
+#body-login body {
+	/* Tokens visuais – inputs e foco */
+	--loglab-field-max: min(100%, 400px);
+	--loglab-input-radius: 12px;
+	--loglab-input-bg: rgba(255, 255, 255, 0.07);
+	--loglab-input-bg-hover: rgba(255, 255, 255, 0.1);
+	--loglab-input-border: rgba(255, 255, 255, 0.14);
+	--loglab-input-border-focus: rgba(249, 168, 37, 0.65);
+	--loglab-accent: #f9a825;
+	--loglab-accent-hover: #ffc94d;
+	--loglab-accent-border: #c77800;
+	/*
+	 * Login só carrega loglab-login.css — NcButton (.button-vue--primary) usa estas vars.
+	 * Sem isso o ENTRAR fica azul padrão do Nextcloud.
+	 */
+	--color-primary-element: #f9a825;
+	--color-primary-element-hover: #e69412;
+	--color-primary-element-text: #1a1a1a;
+	--color-primary-default: #f9a825;
+	/* Espaço vertical entre campos (usuário ↔ senha ↔ lembrar-me) */
+	--loglab-field-gap: 28px;
+	/* Espaço extra entre campo senha e botão ENTRAR */
+	/* Margem no botão + folga real no input senha (ver .loglab-submit-spacer no JS) */
+	--loglab-submit-margin-top: 32px;
+	background: #2d2d2d !important;
+	background-color: #2d2d2d !important;
+	background-image: none !important;
+	color: rgba(255, 255, 255, 0.9) !important;
+	min-height: 100vh !important;
+}
+
+/* Logo: só a imagem logo.png, sem texto extra */
+#body-login #header.header-guest {
+	background: transparent !important;
+	border: none !important;
+	margin-bottom: 24px !important;
+}
+
+#body-login #header.header-guest .logo {
+	width: 280px !important;
+	height: 92px !important;
+	margin: 0 auto !important;
+	background-image: url('../img/logo.png') !important;
+	background-repeat: no-repeat !important;
+	background-size: contain !important;
+	background-position: center !important;
+}
+
+/* Só a logo aparece no topo – esconde texto/duplicata ao lado */
+#body-login #header.header-guest *:not(.logo) {
+	display: none !important;
+}
+
+#body-login #header.header-guest .logo {
+	display: block !important;
+}
+
+/* Wrapper centralizado – caixa de login com 500px de largura */
+#body-login .wrapper {
+	width: 500px !important;
+	max-width: calc(100vw - 40px) !important;
+	margin: 0 auto !important;
+	padding: 0 !important;
+	box-sizing: border-box !important;
+}
+
+#body-login .v-align {
+	border: none !important;
+	box-shadow: none !important;
+	background: transparent !important;
+}
+
+/* Área do login: card com borda suave */
+#body-login .guest-content {
+	background: rgba(0, 0, 0, 0.2) !important;
+	border: 1px solid rgba(255, 255, 255, 0.22) !important;
+	border-radius: 16px !important;
+	padding: 36px 28px !important;
+	box-shadow:
+		0 1px 0 rgba(255, 255, 255, 0.06) inset,
+		0 24px 48px rgba(0, 0, 0, 0.35) !important;
+	box-sizing: border-box !important;
+	width: 500px !important;
+	max-width: 100% !important;
+}
+
+/* Remove toda “segunda caixa” / card interno do Vue */
+#body-login .guest-content > *,
+#body-login #login,
+#body-login #login > *,
+#body-login [class*="login"],
+#body-login [class*="card"],
+#body-login [class*="panel"],
+#body-login [class*="container"] {
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	box-sizing: border-box !important;
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+/* Todos os níveis de div dentro do card: 100% para o input acompanhar o card */
+#body-login .guest-content #login div,
+#body-login .guest-content form div {
+	width: 100% !important;
+	max-width: 100% !important;
+	box-sizing: border-box !important;
+}
+
+#body-login .body-login-container {
+	background: transparent !important;
+	border: none !important;
+	padding: 0 !important;
+}
+
+/* Título (não incluir o h2 do LoginForm Vue — ele tem regra própria abaixo) */
+#body-login .guest-content h2:not([data-login-form-headline]):not(.login-form__headline),
+#body-login [class*="title"]:not([data-login-form-headline]) {
+	color: #fff !important;
+	font-size: 1.15rem !important;
+	font-weight: 600 !important;
+	letter-spacing: 0.02em !important;
+	margin-bottom: var(--loglab-field-gap) !important;
+	max-width: var(--loglab-field-max) !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+}
+
+/*
+ * Headline do LoginForm: o texto é nó de texto direto no h2 (não tem filho *).
+ * Antes .guest-content h2 ganhava na especificidade e reativava font-size/cor → “Nextcloud” aparecia por cima do ::before.
+ */
+#body-login .guest-content h2[data-login-form-headline],
+#body-login form.login-form h2[data-login-form-headline],
+#body-login h2.login-form__headline[data-login-form-headline],
+#body-login h2.login-form__headline {
+	box-sizing: border-box !important;
+	margin-bottom: var(--loglab-field-gap) !important;
+	max-width: var(--loglab-field-max) !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+	position: relative !important;
+	/*
+	 * Com font-size:0, min-height em "em" vira 0 → o h2 some e overflow:hidden corta o ::before.
+	 * Usar rem garante altura para o texto substituto.
+	 */
+	min-height: 2.75rem !important;
+	padding: 0.15rem 0 0.35rem !important;
+	/* Esconde o texto real do Vue (nós de texto no h2) */
+	font-size: 0 !important;
+	line-height: 0 !important;
+	color: transparent !important;
+	-webkit-text-fill-color: transparent !important;
+	text-shadow: none !important;
+	overflow: visible !important;
+	white-space: nowrap !important;
+	text-indent: -9999px !important;
+}
+
+#body-login .guest-content h2[data-login-form-headline] *,
+#body-login form.login-form h2[data-login-form-headline] * {
+	display: none !important;
+}
+
+#body-login .guest-content h2[data-login-form-headline]::before,
+#body-login form.login-form h2[data-login-form-headline]::before,
+#body-login h2.login-form__headline::before {
+	content: "Bem vindo ao Intranet" !important;
+	position: absolute !important;
+	left: 0 !important;
+	right: 0 !important;
+	top: 0 !important;
+	text-align: center !important;
+	display: block !important;
+	color: #fff !important;
+	-webkit-text-fill-color: #fff !important;
+	font-size: 1.15rem !important;
+	line-height: 1.35 !important;
+	font-weight: 600 !important;
+	letter-spacing: 0.02em !important;
+	text-indent: 0 !important;
+	white-space: normal !important;
+	overflow: visible !important;
+	pointer-events: none !important;
+}
+
+/* H1 oculto do layout guest (classe é hidden-visually, não hidden + visually) */
+#body-login h1.hidden-visually {
+	display: none !important;
+}
+
+/* Campo usuário + sufixo – um único bloco estilizado */
+.loglab-user-wrap {
+	display: flex !important;
+	width: 100% !important;
+	max-width: var(--loglab-field-max) !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+	box-sizing: border-box !important;
+	border-radius: var(--loglab-input-radius) !important;
+	overflow: hidden !important;
+	margin-bottom: var(--loglab-field-gap) !important;
+	border: 1px solid var(--loglab-input-border) !important;
+	background: var(--loglab-input-bg) !important;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
+}
+
+.loglab-user-wrap:focus-within {
+	border-color: var(--loglab-input-border-focus) !important;
+	box-shadow:
+		0 0 0 3px rgba(249, 168, 37, 0.2),
+		0 2px 12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.loglab-user-wrap input {
+	flex: 1 1 58% !important;
+	min-width: 0 !important;
+	border: none !important;
+	background: transparent !important;
+	padding: 16px 18px !important;
+	min-height: 52px !important;
+	color: #fff !important;
+	font-size: 1rem !important;
+	line-height: 1.4 !important;
+	-webkit-appearance: none !important;
+	appearance: none !important;
+}
+
+.loglab-user-suffix {
+	flex: 0 0 42% !important;
+	background: rgba(0, 0, 0, 0.22) !important;
+	color: rgba(255, 255, 255, 0.82) !important;
+	font-size: 0.72rem !important;
+	font-weight: 500 !important;
+	letter-spacing: 0.02em !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	padding: 8px 10px !important;
+	border: none !important;
+	border-left: 1px solid var(--loglab-input-border) !important;
+}
+
+/* Irmão logo após o bloco usuário (wrapper da senha no Vue) */
+#body-login .loglab-user-wrap + * {
+	margin-top: var(--loglab-field-gap) !important;
+}
+
+/* Olho nativo do Microsoft Edge / IE (dentro do próprio input) */
+#body-login input[type="password"]::-ms-reveal {
+	display: none !important;
+	width: 0 !important;
+	height: 0 !important;
+}
+
+/* WebKit: decoração interna do campo senha (alguns navegadores) */
+#body-login input[type="password"]::-webkit-credentials-auto-fill-button {
+	visibility: hidden !important;
+	display: none !important;
+	pointer-events: none !important;
+}
+
+/* Nextcloud / Vue: remove completamente o botão “mostrar senha” */
+#body-login button.toggle-password,
+#body-login .guest-content button[class*="toggle"],
+#body-login #login button[class*="toggle"],
+#body-login .guest-content [class*="password"] button:not([type="submit"]),
+#body-login #login [class*="password"] button:not([type="submit"]),
+/* NUNCA o ENTRAR: só o olho/toggle (irmãos do input senha) */
+#body-login input[type="password"] ~ button:not([type="submit"]),
+#body-login input[type="password"] + button:not([type="submit"]),
+#body-login #show,
+#body-login #dbpassword-toggle,
+#body-login #show + label,
+#body-login #dbpassword + label,
+#body-login label[for="show"],
+#body-login label[for="dbpassword-toggle"] {
+	display: none !important;
+	visibility: hidden !important;
+	opacity: 0 !important;
+	pointer-events: none !important;
+	position: absolute !important;
+	width: 0 !important;
+	height: 0 !important;
+	overflow: hidden !important;
+	clip: rect(0, 0, 0, 0) !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+}
+
+/* Campos soltos (senha, e-mail sem wrap): altura, borda, foco */
+#body-login input[type="password"],
+#body-login input[type="text"]:not(.loglab-user-wrap input),
+#body-login input[type="email"] {
+	background: var(--loglab-input-bg) !important;
+	border: 1px solid var(--loglab-input-border) !important;
+	border-radius: var(--loglab-input-radius) !important;
+	color: #fff !important;
+	padding: 16px 18px !important;
+	min-height: 52px !important;
+	width: 100% !important;
+	max-width: var(--loglab-field-max) !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+	box-sizing: border-box !important;
+	font-size: 1rem !important;
+	line-height: 1.4 !important;
+	-webkit-appearance: none !important;
+	appearance: none !important;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18) !important;
+	transition:
+		border-color 0.2s ease,
+		background 0.2s ease,
+		box-shadow 0.2s ease !important;
+}
+
+/* Só texto/e-mail: sem margem inferior. Senha: espaço ANTES do ENTRAR (não usar margin-bottom:0 na senha — some em alguns layouts). */
+#body-login input[type="text"]:not(.loglab-user-wrap input),
+#body-login input[type="email"] {
+	margin-bottom: 0 !important;
+}
+
+#body-login input[type="password"] {
+	margin-bottom: calc(var(--loglab-field-gap) + 64px) !important;
+}
+
+#body-login input[type="password"]:hover,
+#body-login input[type="text"]:not(.loglab-user-wrap input):hover,
+#body-login input[type="email"]:hover {
+	background: var(--loglab-input-bg-hover) !important;
+	border-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+/* Senha: afasta do usuário; margin-bottom global já separa do ENTRAR */
+#body-login #login input[type="password"],
+#body-login .guest-content input[type="password"] {
+	margin-top: var(--loglab-field-gap) !important;
+	padding-inline-end: 18px !important;
+	padding-right: 18px !important;
+}
+
+/* Evita margem dupla: o espaço já veio no div irmão de .loglab-user-wrap */
+#body-login #login .loglab-user-wrap + * input[type="password"],
+#body-login .guest-content .loglab-user-wrap + * input[type="password"] {
+	margin-top: 0 !important;
+}
+
+/*
+ * Senha igual ao usuário: placeholder dentro do input e sem texto solto acima.
+ * Em password, :placeholder-shown pode falhar; usar input-field--label-outside + placeholder.
+ */
+#body-login .input-field:has(input#password),
+#body-login .input-field:has(input[name="password"][type="password"]) {
+	margin-block-start: 6px !important;
+}
+
+/* Esconde o label externo da senha (o que aparece “solto” acima do campo) */
+#body-login form.login-form label[for="password"],
+#body-login #login label[for="password"],
+#body-login .guest-content label[for="password"] {
+	display: none !important;
+}
+
+/* Força placeholder da senha visível e com o mesmo tom do usuário */
+#body-login .input-field.input-field--label-outside input[type="password"]::placeholder,
+#body-login .input-field input#password::placeholder,
+#body-login input#password::placeholder {
+	opacity: 1 !important;
+	color: rgba(255, 255, 255, 0.38) !important;
+	-webkit-text-fill-color: rgba(255, 255, 255, 0.38) !important;
+}
+
+
+/*
+ * “Lembre-se de mim” — Nextcloud LoginForm usa NcCheckboxRadioSwitch:
+ * id="rememberme", name="rememberme", data-login-form-input-rememberme
+ * (não confundir com remember_login; o input pode estar escondido no componente)
+ */
+#body-login #rememberme,
+#body-login [data-login-form-input-rememberme],
+#body-login input[name="rememberme"],
+#body-login label[for="rememberme"],
+/* Só no login: NcCheckboxRadioSwitch do “Lembre-se de mim” */
+#body-login #login .checkbox-radio-switch:has(input[name="rememberme"]),
+#body-login .guest-content #login .checkbox-radio-switch:has(input[name="rememberme"]) {
+	display: none !important;
+	visibility: hidden !important;
+	position: absolute !important;
+	width: 0 !important;
+	height: 0 !important;
+	opacity: 0 !important;
+	pointer-events: none !important;
+	clip: rect(0, 0, 0, 0) !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	overflow: hidden !important;
+	border: 0 !important;
+}
+
+#body-login input::placeholder {
+	color: rgba(255, 255, 255, 0.38) !important;
+	font-weight: 400 !important;
+	opacity: 1 !important;
+	background: none !important;
+	-webkit-text-fill-color: rgba(255, 255, 255, 0.38) !important;
+}
+
+/* Evita “caixa” escura atrás do placeholder (WebKit / autofill) */
+#body-login input:-webkit-autofill,
+#body-login input:-webkit-autofill:hover,
+#body-login input:-webkit-autofill:focus {
+	-webkit-text-fill-color: #fff !important;
+	transition: background-color 99999s ease-out 0s !important;
+	box-shadow: 0 0 0 1000px var(--loglab-input-bg) inset !important;
+}
+
+#body-login input:focus {
+	outline: none !important;
+	border-color: var(--loglab-input-border-focus) !important;
+	background: var(--loglab-input-bg-hover) !important;
+	box-shadow:
+		0 0 0 3px rgba(249, 168, 37, 0.22),
+		0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+#body-login label {
+	color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/*
+ * Nextcloud LoginForm (Vue): fieldset em coluna — evita flex/grid interno colar o ENTRAR na senha.
+ */
+#body-login fieldset.login-form__fieldset,
+#body-login form.login-form fieldset {
+	display: flex !important;
+	flex-direction: column !important;
+	align-items: stretch !important;
+	width: 100% !important;
+	box-sizing: border-box !important;
+	/* Espaço entre blocos do form (Vue); o spacer .loglab-submit-spacer reforça antes do ENTRAR */
+	row-gap: 12px !important;
+}
+
+/* Inserido pelo loglab-login.js antes do botão ENTRAR */
+#body-login .loglab-submit-spacer {
+	display: block !important;
+	flex: 0 0 auto !important;
+	height: 56px !important;
+	min-height: 56px !important;
+	width: 100% !important;
+	max-width: var(--loglab-field-max) !important;
+	margin: 0 auto !important;
+	padding: 0 !important;
+	pointer-events: none !important;
+	background: transparent !important;
+	border: none !important;
+	box-sizing: border-box !important;
+}
+
+/* Raiz do LoginButton no form */
+#body-login form.login-form [data-login-form-submit],
+#body-login #login form [data-login-form-submit],
+#body-login form.login-form button[data-login-form-submit] {
+	width: 100% !important;
+	max-width: var(--loglab-field-max) !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+	flex-shrink: 0 !important;
+	align-self: center !important;
+}
+
+/* Bloco do campo senha (Nc*) */
+#body-login fieldset .input-field:has(input[type="password"]) {
+	margin-bottom: 48px !important;
+}
+
+/*
+ * ENTRAR = NcButton .button-vue--primary (CSS do Vue costuma vir depois do tema → !important).
+ * Cor sólida amarelo logo; não usar só variáveis se o chunk ignorar herança.
+ */
+#body-login form.login-form .button-vue.button-vue--primary,
+#body-login #login form .button-vue.button-vue--primary,
+#body-login .guest-content form .button-vue.button-vue--primary {
+	position: relative !important;
+	display: flex !important;
+	width: 100% !important;
+	max-width: var(--loglab-field-max) !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+	margin-top: var(--loglab-submit-margin-top) !important;
+	margin-bottom: 0 !important;
+	box-sizing: border-box !important;
+	background-color: var(--loglab-accent) !important;
+	background-image: none !important;
+	color: #1a1a1a !important;
+	border: none !important;
+	border-bottom-width: 3px !important;
+	border-radius: var(--loglab-input-radius) !important;
+	padding: 16px 22px !important;
+	min-height: 52px !important;
+	font-weight: 700 !important;
+	font-size: 0.95rem !important;
+	letter-spacing: 0.04em !important;
+	text-transform: uppercase !important;
+	box-shadow: 0 6px 20px rgba(249, 168, 37, 0.35) !important;
+	clear: both !important;
+	z-index: 3 !important;
+	text-shadow: none !important;
+	text-decoration: none !important;
+}
+
+#body-login form.login-form .button-vue.button-vue--primary:hover:not(:disabled),
+#body-login #login form .button-vue.button-vue--primary:hover:not(:disabled),
+#body-login .guest-content form .button-vue.button-vue--primary:hover:not(:disabled) {
+	background-color: var(--loglab-accent-hover) !important;
+	border-color: var(--color-primary-element-hover) !important;
+	color: #1a1a1a !important;
+	filter: none !important;
+}
+
+#body-login form.login-form .button-vue.button-vue--primary:active:not(:disabled),
+#body-login #login form .button-vue.button-vue--primary:active:not(:disabled) {
+	background-color: var(--color-primary-element-hover) !important;
+}
+
+#body-login form.login-form .button-vue.button-vue--primary *,
+#body-login #login form .button-vue.button-vue--primary *,
+#body-login .guest-content form .button-vue.button-vue--primary * {
+	color: inherit !important;
+	fill: currentColor !important;
+	stroke: currentColor !important;
+}
+
+/* Links */
+#body-login .guest-content a:not(.primary),
+#body-login #login a {
+	color: rgba(255, 255, 255, 0.85) !important;
+	font-size: 0.8rem !important;
+	text-transform: uppercase !important;
+	letter-spacing: 0.03em !important;
+	display: block !important;
+	text-align: center !important;
+	margin-top: 6px !important;
+}
+
+#body-login .guest-content a:hover,
+#body-login #login a:hover {
+	color: #fff !important;
+	text-decoration: underline !important;
+}
+
+/* Rodapé dentro da caixa: linha + versão */
+.loglab-login-footer {
+	margin-top: 24px !important;
+	padding-top: 16px !important;
+	border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+	text-align: center !important;
+}
+
+.loglab-login-version {
+	font-size: 0.85rem !important;
+	font-weight: 700 !important;
+	color: #F9A825 !important;
+}
+
+/* Footer da página – discreto, sem pill/borda */
+#body-login footer.guest-box {
+	background: transparent !important;
+	border: none !important;
+	margin-top: 20px !important;
+	box-shadow: none !important;
+}
+
+#body-login footer .info,
+#body-login footer [class*="pill"],
+#body-login footer p {
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	color: rgba(255, 255, 255, 0.35) !important;
+	font-size: 0.75rem !important;
+}
+
+/* Remove definitivamente menções da marca Nextcloud no rodapé padrão */
+#body-login footer.guest-box .info a,
+#body-login footer.guest-box .info strong,
+#body-login footer.guest-box .info b {
+	display: none !important;
+}
+/* Form e #login: 100% da largura do card, inputs acompanham o card */
+#body-login #login {
+	width: 100% !important;
+	max-width: 100% !important;
+	text-align: center !important;
+}
+
+#body-login #login form {
+	display: flex !important;
+	flex-direction: column !important;
+	gap: var(--loglab-field-gap) !important;
+	align-items: center !important;
+	width: 100% !important;
+	max-width: 100% !important;
+	box-sizing: border-box !important;
+}
+
+/*
+ * Largura dos blocos do form — SEM div:has(input) nem [class*="input"] genéricos:
+ * eles pegavam um pai comum que continha senha + “Lembrar-me” e quebravam o layout.
+ */
+#body-login #login form > *,
+#body-login .guest-content form > *,
+#body-login #login div[class*="field"],
+#body-login #login label + div,
+#body-login #login .form-group {
+	width: 100% !important;
+	max-width: var(--loglab-field-max) !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+	box-sizing: border-box !important;
+}
+
+/* Input dentro do form: bloco — exceto checkbox */
+#body-login .guest-content input:not(.loglab-user-wrap input):not([type="checkbox"]),
+#body-login #login input:not(.loglab-user-wrap input):not([type="checkbox"]) {
+	display: block !important;
+}
+

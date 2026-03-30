@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+	<id>loglab_theme</id>
+	<name>Log.lab Theme</name>
+	<summary>Tema Log.lab | SARA para Nextcloud</summary>
+	<description>Layout escuro com barra superior, sidebar e área de conteúdo clara no padrão Log.lab.</description>
+	<version>1.0.0</version>
+	<licence>agpl</licence>
+	<author>Log.lab</author>
+	<namespace>LoglabTheme</namespace>
+	<category>customization</category>
+	<dependencies>
+		<nextcloud min-version="33" max-version="33"/>
+	</dependencies>
+</info>

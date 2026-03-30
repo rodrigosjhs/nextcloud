@@ -1,0 +1,23 @@
+<?php
+$CONFIG = array (
+  'instanceid' => 'oc3kcdarab6p',
+  'passwordsalt' => 'P3TzHIDQQ5n9wIvyf89vPYVEmZnH91',
+  'secret' => 'ip5dPpMe/L/gaYkUYqEAZZCY/QQymA405VgVsO8hWe9N5VuD',
+  'trusted_domains' => 
+  array (
+    0 => 'intranet.loglabprojetos.com.br',
+  ),
+  'datadirectory' => '/var/www/nextcloud/data',
+  'dbtype' => 'mysql',
+  'version' => '33.0.0.16',
+  'overwrite.cli.url' => 'https://infra.loglabprojetos.com.br',
+  'dbname' => 'nextcloud-custom',
+  'dbhost' => '10.10.100.32:30044',
+  'dbtableprefix' => 'oc_',
+  'dbuser' => 'yumit-mariadb-prd',
+  'dbpassword' => 'll@2025#!',
+  'installed' => true,
+  'loglab_auth_login_url' => 'https://infra.loglabprojetos.com.br/microsservices/auth/login',
+  'mysql.utf8mb4' => true,
+  'debug' => true,
+);

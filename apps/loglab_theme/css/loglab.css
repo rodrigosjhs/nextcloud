@@ -1,0 +1,1514 @@
+/**
+ * Log.lab | SARA - Tema Nextcloud
+ * Layout: header/sidebar escuros; área central clara (#f3f4f6 + texto escuro).
+ */
+
+ :root {
+	--loglab-dark: #1a1a1d;
+	--loglab-dark-header: #151518;
+	--loglab-accent: #FFD700;
+	--loglab-accent-orange: #F9A825;
+	--loglab-accent-muted: #e6c200;
+	/* Tokens só da faixa central (#content) — não afetam sidebar/header */
+	--loglab-content-bg: #f3f4f6;
+	--loglab-content-text: rgba(33, 37, 41, 0.75);
+	--loglab-content-heading: rgba(33, 37, 41, 0.92);
+	--loglab-content-card: #ffffff;
+	--loglab-content-card-border: rgba(0, 0, 0, 0.08);
+	--loglab-content-input-bg: #ffffff;
+	--loglab-content-input-border: #e5e7eb;
+	--loglab-content-placeholder: rgba(33, 37, 41, 0.45);
+	/* Aliases usados pelos blocos #content abaixo */
+	--loglab-bg: var(--loglab-content-bg);
+	--loglab-card: var(--loglab-content-card);
+	--loglab-card-border: var(--loglab-content-card-border);
+	--loglab-text: var(--loglab-content-text);
+	--loglab-text-muted: var(--loglab-content-text);
+	--loglab-text-subtle: rgba(33, 37, 41, 0.55);
+	--loglab-input-bg: var(--loglab-content-input-bg);
+	--loglab-input-border: var(--loglab-content-input-border);
+	--loglab-sidebar-width: 280px;
+	--loglab-sidebar-collapsed-width: 0px;
+	--loglab-header-height: 52px;
+	--loglab-radius: 8px;
+	--loglab-radius-lg: 12px;
+	--loglab-font: 'Inter', 'Roboto', 'Open Sans', system-ui, sans-serif;
+}
+
+/*
+ * Variáveis globais do NC: base neutra; o contraste real da área de trabalho vem de #content (abaixo).
+ */
+body[data-themes] {
+	--color-primary: var(--loglab-accent);
+	--color-primary-element: var(--loglab-accent);
+	--color-primary-hover: var(--loglab-accent-muted);
+	--color-primary-element-hover: var(--loglab-accent-muted);
+	--color-primary-element-text: #141414;
+	--color-main-background: var(--loglab-content-bg);
+	--color-main-text: var(--loglab-content-text);
+	--color-text-maxcontrast: var(--loglab-content-text);
+	--color-text-lighter: var(--loglab-text-subtle);
+	--color-text-dark: rgba(33, 37, 41, 0.92);
+	--color-text-light: #ffffff;
+	--color-placeholder-light: var(--loglab-content-placeholder);
+	--color-placeholder-dark: var(--loglab-content-placeholder);
+	--color-background-hover: rgba(0, 0, 0, 0.05);
+	--color-background-dark: #e5e7eb;
+	--color-border: rgba(0, 0, 0, 0.1);
+	--color-border-dark: rgba(0, 0, 0, 0.14);
+	--color-box-shadow: rgba(0, 0, 0, 0.12);
+	--color-primary-element-light: rgba(255, 215, 0, 0.2);
+	--color-primary-element-light-hover: rgba(255, 215, 0, 0.28);
+	--color-primary-element-light-text: rgba(33, 37, 41, 0.85);
+}
+
+/* Dropdowns/modais que abrem do header usam fundo escuro (evitar branco) */
+#notifications,
+#contactsmenu,
+#unified-search {
+	--color-main-background: #18181b;
+	--color-main-text: rgba(255, 255, 255, 0.9);
+	--color-text-maxcontrast: rgba(255, 255, 255, 0.6);
+}
+
+/* ---- Layout: sidebar + top bar + content ---- */
+/*
+ * O #header em flex ocupa 100vw×100vh para posicionar sidebar + barra superior.
+ * Se o fundo for opaco em todo o #header, a área principal fica INVISÍVEL por baixo
+ * (z-index 2000 > #content). Fundo só nos filhos + pointer-events evita cobrir o app.
+ */
+#header:not(.header-guest) {
+	display: flex !important;
+	flex-direction: row !important;
+	position: fixed !important;
+	top: 0 !important;
+	left: 0 !important;
+	width: 100% !important;
+	height: 100vh !important;
+	min-height: 100vh !important;
+	z-index: 2000 !important;
+	background: transparent !important;
+	pointer-events: none !important;
+	box-sizing: border-box !important;
+}
+
+#header:not(.header-guest) > * {
+	pointer-events: auto !important;
+}
+
+/* Sidebar (esquerda) - colapsável via .loglab-sidebar-collapsed no body */
+#header .header-start {
+	width: var(--loglab-sidebar-width) !important;
+	min-width: var(--loglab-sidebar-width) !important;
+	flex: 0 0 var(--loglab-sidebar-width) !important;
+	height: 100vh !important;
+	min-height: 100vh !important;
+	display: flex !important;
+	flex-direction: column !important;
+	align-items: stretch !important;
+	background:#30302e !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	border-inline-end: 1px solid rgba(255, 255, 255, 0.06) !important;
+	transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+	            min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+	            flex-basis 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+	position: relative !important;
+	/* Core usa nowrap — impede layout vertical legível dos itens do app menu */
+	white-space: normal !important;
+}
+
+/* Estado colapsado: sidebar encolhe, conteúdo expande */
+body.loglab-sidebar-collapsed #header .header-start {
+	width: var(--loglab-sidebar-collapsed-width) !important;
+	min-width: var(--loglab-sidebar-collapsed-width) !important;
+	flex: 0 0 var(--loglab-sidebar-collapsed-width) !important;
+	border-inline-end: none !important;
+	overflow: hidden !important;
+}
+body.loglab-sidebar-collapsed #content {
+	margin-inline-start: var(--loglab-sidebar-collapsed-width) !important;
+	width: calc(100% - var(--loglab-sidebar-collapsed-width)) !important;
+	max-width: calc(100% - var(--loglab-sidebar-collapsed-width)) !important;
+}
+
+/* Botão toggle da sidebar - fixo no viewport, não dentro do sidebar (evita overflow clip) */
+.loglab-sidebar-toggle {
+	position: fixed !important;
+	bottom: 20px !important;
+	left: calc(var(--loglab-sidebar-width) - 14px) !important;
+	width: 28px !important;
+	height: 28px !important;
+	border-radius: 50% !important;
+	background: var(--loglab-dark) !important;
+	border: 2px solid rgba(255, 255, 255, 0.15) !important;
+	color: rgba(255, 255, 255, 0.7) !important;
+	cursor: pointer !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	z-index: 2002 !important;
+	transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+	            background 0.2s ease !important;
+	pointer-events: auto !important;
+	padding: 0 !important;
+}
+.loglab-sidebar-toggle:hover {
+	background: rgba(255, 215, 0, 0.18) !important;
+	border-color: var(--loglab-accent) !important;
+	color: var(--loglab-accent) !important;
+}
+.loglab-sidebar-toggle svg {
+	width: 24px !important;
+	/* height: 14px !important; */
+	fill: currentColor !important;
+	transition: transform 0.25s ease !important;
+}
+body.loglab-sidebar-collapsed .loglab-sidebar-toggle {
+	left: 8px !important;
+}
+body.loglab-sidebar-collapsed .loglab-sidebar-toggle svg {
+	transform: rotate(180deg) !important;
+}
+
+/* Topo da sidebar: logo Log.lab (três círculos + texto) – substitui o topo antigo */
+#header .header-start #nextcloud {
+	padding: 16px 20px !important;
+	height: auto !important;
+	margin: 0 !important;
+	display: flex !important;
+	align-items: center !important;
+	flex-wrap: wrap !important;
+	/* border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important; */
+	text-decoration: none !important;
+}
+
+/* Esconder logo padrão do Nextcloud quando existe a nova logo */
+#header .header-start #nextcloud .logo,
+#header .header-start #nextcloud .logo-icon {
+	display: none !important;
+}
+
+#header .header-start #nextcloud .loglab-header {
+	display: flex !important;
+	align-items: center !important;
+	gap: 12px !important;
+	width: 100% !important;
+}
+
+/* Ícone três círculos interconectados (branco) */
+#header .header-start #nextcloud .loglab-icon {
+	width: 40px !important;
+	height: 24px !important;
+	flex-shrink: 0 !important;
+}
+
+#header .header-start #nextcloud .loglab-brand-wrap {
+	display: flex !important;
+	flex-direction: column !important;
+	gap: 2px !important;
+	min-width: 0 !important;
+}
+
+/* Texto "Log.lab | SARA" – Log.lab branco, | SARA em amarelo/laranja */
+#header .header-start #nextcloud .loglab-brand {
+	font-family: var(--loglab-font) !important;
+	font-size: 1.15rem !important;
+	font-weight: 600 !important;
+	color: #fff !important;
+	letter-spacing: 0.02em !important;
+	line-height: 1.2 !important;
+}
+
+#header .header-start #nextcloud .loglab-brand .sara {
+	color: var(--loglab-accent-orange) !important;
+}
+
+/* Slogan "TECNOLOGIA QUE TRANSFORMA" */
+#header .header-start #nextcloud .loglab-slogan {
+	font-family: var(--loglab-font) !important;
+	font-size: 0.65rem !important;
+	font-weight: 600 !important;
+	letter-spacing: 0.12em !important;
+	color: var(--loglab-accent-orange) !important;
+	text-transform: uppercase !important;
+	line-height: 1.2 !important;
+}
+
+/*
+ * Mesma imagem da tela de login (apps/loglab_theme/img/logo.png), acima de "Buscar no menu...".
+ */
+#header .header-start .loglab-sidebar-login-logo {
+	display: block !important;
+	flex-shrink: 0 !important;
+	padding: 8px 16px 4px !important;
+	box-sizing: border-box !important;
+	text-align: center !important;
+	text-decoration: none !important;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+#header .header-start .loglab-sidebar-login-logo__img {
+	display: block !important;
+	/* width: 100% !important; */
+	/* max-width: 220px !important; */
+	/* height: auto !important; */
+	max-height: 66px !important;
+	margin: 0 auto !important;
+	/* object-fit: contain !important; */
+	position: relative;
+	top: -10px;
+}
+
+body.loglab-sidebar-collapsed #header .header-start .loglab-sidebar-login-logo {
+	display: none !important;
+}
+
+/* Buscar no menu - área de busca na sidebar */
+.loglab-sidebar-search {
+	margin: 12px 16px !important;
+	padding: 10px 12px 10px 36px !important;
+	background: rgba(255, 255, 255, 0.06) !important;
+	border: 1px solid rgba(255, 255, 255, 0.08) !important;
+	border-radius: var(--loglab-radius) !important;
+	color: rgba(255, 255, 255, 0.7) !important;
+	font-size: 0.9rem !important;
+	font-family: var(--loglab-font) !important;
+	width: calc(100% - 32px) !important;
+	box-sizing: border-box !important;
+}
+
+.loglab-sidebar-search::placeholder {
+	color: rgba(255, 255, 255, 0.45) !important;
+}
+
+/*
+ * Menu de apps na sidebar — layout lista (ícone + texto), estilo referência Log.lab.
+ * Duplo escopo: #header-start__appmenu (template PHP) OU nav.app-menu filho direto
+ * (após $mount o id pode não existir no DOM — o CSS só com # falhava).
+ */
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) {
+	display: flex !important;
+	flex-direction: column !important;
+	align-items: stretch !important;
+	flex: 1 1 auto !important;
+	padding: 10px 0 20px !important;
+	overflow-x: hidden !important;
+	overflow-y: auto !important;
+	min-height: 120px !important;
+	visibility: visible !important;
+	opacity: 1 !important;
+	width: 100% !important;
+	min-width: 0 !important;
+	box-sizing: border-box !important;
+}
+
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) > *,
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu {
+	display: flex !important;
+	flex-direction: column !important;
+	align-items: stretch !important;
+	flex: 1 1 auto !important;
+	width: 100% !important;
+	min-width: 0 !important;
+	min-height: 0 !important;
+	visibility: visible !important;
+	opacity: 1 !important;
+}
+
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu__list {
+	display: flex !important;
+	flex-direction: column !important;
+	align-items: stretch !important;
+	flex-wrap: nowrap !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	list-style: none !important;
+	width: 100% !important;
+	gap: 2px !important;
+}
+
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu__overflow {
+	margin: 8px 8px 0 !important;
+}
+
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu-entry,
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) li.app-menu-entry,
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) [role="menuitem"] {
+	display: flex !important;
+	flex-direction: row !important;
+	align-items: stretch !important;
+	width: 100% !important;
+	height: auto !important;
+	min-height: 0 !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	border: none !important;
+	border-radius: 0 !important;
+	background: transparent !important;
+	box-sizing: border-box !important;
+	visibility: visible !important;
+	opacity: 1 !important;
+}
+
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu-entry__link {
+	color: rgba(255, 255, 255, 0.68) !important;
+	font-family: var(--loglab-font) !important;
+	font-size: 0.9375rem !important;
+	font-weight: 500 !important;
+	text-decoration: none !important;
+	display: flex !important;
+	flex-direction: row !important;
+	align-items: center !important;
+	justify-content: flex-start !important;
+	gap: 14px !important;
+	width: calc(100% - 16px) !important;
+	max-width: calc(100% - 16px) !important;
+	height: auto !important;
+	min-height: 44px !important;
+	padding: 10px 14px !important;
+	border-radius: 10px !important;
+	margin: 0 8px !important;
+	transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease !important;
+	letter-spacing: 0.01em !important;
+	line-height: 1.25 !important;
+}
+
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu-entry__link:hover {
+	color: rgba(255, 255, 255, 0.95) !important;
+	background: rgba(255, 255, 255, 0.07) !important;
+}
+
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu-entry--active .app-menu-entry__link {
+	color: var(--loglab-accent) !important;
+	background: rgba(255, 215, 0, 0.12) !important;
+	font-weight: 600 !important;
+	box-shadow: inset 3px 0 0 var(--loglab-accent) !important;
+}
+
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu-icon {
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	flex-shrink: 0 !important;
+	width: 24px !important;
+	height: 24px !important;
+}
+
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu-icon__icon,
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu-icon img {
+	width: 22px !important;
+	height: 22px !important;
+	object-fit: contain !important;
+	filter: brightness(0) invert(1) !important;
+	opacity: 0.75 !important;
+	mask: none !important;
+	-webkit-mask: none !important;
+	margin: 0 !important;
+	transition: filter 0.18s ease, opacity 0.18s ease !important;
+}
+
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu-entry--active .app-menu-icon__icon,
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu-entry--active .app-menu-icon img {
+	filter: brightness(0) saturate(100%) invert(80%) sepia(60%) saturate(560%) hue-rotate(359deg) brightness(103%) contrast(104%) !important;
+	opacity: 1 !important;
+}
+
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu-entry__link:hover .app-menu-icon__icon,
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu-entry__link:hover .app-menu-icon img {
+	filter: brightness(0) invert(1) !important;
+	opacity: 0.95 !important;
+}
+
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu-entry__label {
+	opacity: 1 !important;
+	position: static !important;
+	transform: none !important;
+	inset-inline-start: unset !important;
+	bottom: unset !important;
+	max-width: none !important;
+	flex: 1 1 auto !important;
+	min-width: 0 !important;
+	white-space: nowrap !important;
+	overflow: hidden !important;
+	text-overflow: ellipsis !important;
+	font-size: inherit !important;
+	text-align: start !important;
+	letter-spacing: inherit !important;
+}
+
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .app-menu-entry--active::before {
+	display: none !important;
+}
+
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) .icon,
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) [class^="icon-"],
+:is(#header-start__appmenu, #header:not(.header-guest) .header-start > nav.app-menu) svg {
+	color: rgba(255, 255, 255, 0.75) !important;
+	fill: rgba(255, 255, 255, 0.75) !important;
+	filter: none !important;
+	width: 22px !important;
+	height: 22px !important;
+	flex-shrink: 0 !important;
+}
+
+/* Barra superior (direita do layout) */
+#header .header-end {
+	flex: 1 !important;
+	display: flex !important;
+	flex-direction: row !important;
+	align-items: center !important;
+	justify-content: flex-end !important;
+	height: var(--loglab-header-height) !important;
+	min-height: var(--loglab-header-height) !important;
+	max-height: var(--loglab-header-height) !important;
+	background: #30302e !important;
+	padding: 0 24px !important;
+	margin: 0 !important;
+	margin-inline-start: 0 !important;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+	align-self: flex-start !important;
+}
+
+/* Badge de versão (1.0) - injetado via JS */
+.loglab-version-badge {
+	background: #f93 !important;
+	color: #000 !important;
+	font-size: 0.75rem !important;
+	font-weight: 600 !important;
+	padding: 4px 10px !important;
+	border-radius: 100px !important;
+	margin-inline-end: 16px !important;
+}
+
+/* User menu e botão Sair na barra */
+#header .header-end #user-menu button,
+#header .header-end .header-menu__trigger {
+	color: rgba(255, 255, 255, 0.9) !important;
+}
+
+#header .header-end a[href*="logout"],
+#header .header-end .user-menu__logout,
+#header .header-end [class*="logout"] {
+	color: var(--loglab-accent) !important;
+	font-weight: 500 !important;
+}
+
+#header .header-end #unified-search input,
+#header .header-end .unified-search__form input {
+	background: rgba(255, 255, 255, 0.08) !important;
+	border: 1px solid rgba(255, 255, 255, 0.1) !important;
+	color: #fff !important;
+	border-radius: var(--loglab-radius) !important;
+}
+
+/* Área de conteúdo principal (somente o “meio”: fundo cinza-claro + texto escuro) */
+/*
+ * Área de conteúdo principal.
+ * padding-inline-start: 0 para evitar que a NcAppNavigation Vue "vaze" quando
+ * fechada (margin-inline-start negativo). overflow: clip (core padrão) recorta
+ * tudo que extrapola o border-box; os filhos (#app-content etc.) rolam internamente.
+ */
+#content {
+	margin-inline-start: var(--loglab-sidebar-width) !important;
+	margin-top: var(--loglab-header-height) !important;
+	width: calc(100% - var(--loglab-sidebar-width)) !important;
+	max-width: calc(100% - var(--loglab-sidebar-width)) !important;
+	min-width: 0 !important;
+	min-height: calc(100vh - var(--loglab-header-height)) !important;
+	background: #f3f4f6 !important;
+	color: rgba(33, 37, 41, 0.75) !important;
+	padding: 24px 24px 24px 0 !important;
+	box-sizing: border-box !important;
+	display: flex !important;
+	flex-direction: row !important;
+	align-items: stretch !important;
+	overflow-x: clip !important;
+	overflow-y: auto !important;
+	transition: margin-inline-start 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+	            width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+	            max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+	--color-main-background: #ffffff;
+	--color-main-text: rgba(33, 37, 41, 0.75);
+	--color-text-maxcontrast: rgba(33, 37, 41, 0.75);
+	--color-text-lighter: rgba(33, 37, 41, 0.55);
+	--color-placeholder-light: rgba(33, 37, 41, 0.45);
+	--color-placeholder-dark: rgba(33, 37, 41, 0.45);
+	--color-border: rgba(0, 0, 0, 0.1);
+	--color-background-hover: rgba(0, 0, 0, 0.04);
+	--color-box-shadow: rgba(0, 0, 0, 0.08);
+}
+
+/*
+ * NcAppNavigation Vue (apps, Descobrir, etc.).
+ * O chunk do Vue aplica .app-navigation[data-v-*] com background-color via variáveis + backdrop-filter.
+ * Forçamos fundo sólido escuro (como a sidebar), texto claro, e removemos o blur para não “vazar” faixa/claridade.
+ * Duplicado em body[data-themes] (fim do ficheiro) + loglab.js (inline !important) se #content não envolver a nav.
+ */
+#content .app-navigation {
+	--color-main-background: var(--loglab-dark) !important;
+	--color-main-background-blur: var(--loglab-dark) !important;
+	--color-main-text: rgba(255, 255, 255, 0.9) !important;
+	--color-text-maxcontrast: rgba(255, 255, 255, 0.55) !important;
+	--color-text-maxcontrast-default: rgba(255, 255, 255, 0.55) !important;
+	--color-text-maxcontrast-background-blur: rgba(255, 255, 255, 0.55) !important;
+	background-color: var(--loglab-dark) !important;
+	background-image: none !important;
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+	color: rgba(255, 255, 255, 0.9) !important;
+	border-inline-end: 1px solid rgba(255, 255, 255, 0.08) !important;
+	transition: visibility 0s linear 0s, opacity 0.2s ease !important;
+}
+
+/* CORREÇÃO: Esconde completamente a NcAppNavigation quando fechada.
+ * Impede qualquer pixel de vazar pela borda do #content. */
+#content .app-navigation.app-navigation--closed,
+#content .app-navigation[class*="--closed"] {
+	visibility: hidden !important;
+	opacity: 0 !important;
+	pointer-events: none !important;
+	transition: visibility 0s linear 0.2s, opacity 0.2s ease !important;
+}
+
+#content .app-navigation a,
+#content .app-navigation span,
+#content .app-navigation .app-navigation-caption {
+	color: rgba(255, 255, 255, 0.88) !important;
+}
+
+#content .app-navigation [class*="active"] > a,
+#content .app-navigation [class*="active"] > a span,
+#content .app-navigation [class*="router-link-active"],
+#content .app-navigation .active a,
+#content .app-navigation .active span {
+	color: #ffffff !important;
+	font-weight: 600 !important;
+}
+
+/* Botão toggle (hamburger) da NcAppNavigation Vue — sempre visível */
+#content .app-navigation-toggle {
+	background-color: var(--loglab-dark) !important;
+	color: rgba(255, 255, 255, 0.9) !important;
+}
+#content .app-navigation-toggle-wrapper {
+	visibility: visible !important;
+	opacity: 1 !important;
+	pointer-events: auto !important;
+}
+
+/* Evita 100vw no filho flex (Configurações, Arquivos, etc.) — era a causa do overflow lateral.
+ * Padding-inline-start compensa o padding 0 do #content no lado esquerdo. */
+#content #app-content,
+#content #app-content-vue,
+#content > .app-content {
+	flex: 1 1 auto !important;
+	flex-basis: auto !important;
+	min-width: 0 !important;
+	max-width: 100% !important;
+	overflow: auto !important;
+	padding-inline-start: 24px !important;
+}
+
+/* Reforço para raízes Vue dentro do conteúdo */
+#content-vue,
+#app-content-vue {
+	color: rgba(33, 37, 41, 0.75) !important;
+	--color-main-background: #ffffff;
+	--color-main-text: rgba(33, 37, 41, 0.75);
+	--color-text-maxcontrast: rgba(33, 37, 41, 0.75);
+}
+
+/* Cards / painéis na área principal */
+#content .app-content,
+#content .app-content-list,
+#content [class*="content-list"],
+#content .section {
+	background: var(--loglab-content-card) !important;
+	color: rgba(33, 37, 41, 0.75) !important;
+	border: 1px solid var(--loglab-content-card-border) !important;
+	border-radius: var(--loglab-radius-lg) !important;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+	padding: 24px !important;
+}
+
+/* NcAppContent Vue (ao lado de NcAppNavigation): container plano, não card.
+ * Vem DEPOIS da regra de cards para ganhar na cascata. */
+#content > .app-navigation ~ .app-content,
+#content > .app-navigation + .app-content {
+	background: transparent !important;
+	border: none !important;
+	border-radius: 0 !important;
+	box-shadow: none !important;
+}
+
+#content h1,
+#content h2,
+#content h3,
+#content h4,
+#content .section h2,
+#content .section h3 {
+	color: var(--loglab-content-heading) !important;
+}
+
+#content .emptycontent,
+#content .empty-content,
+#content [class*="emptycontent"] {
+	color: rgba(33, 37, 41, 0.75) !important;
+}
+
+#content .emptycontent .icon,
+#content [class*="emptycontent"] svg {
+	color: var(--loglab-accent) !important;
+	fill: var(--loglab-accent) !important;
+	opacity: 1 !important;
+}
+
+#content a:not(.button-vue):not([class*="button-vue"]):not(.app-menu-entry) {
+	color: rgba(33, 37, 41, 0.85) !important;
+}
+
+#content a:not(.button-vue):not([class*="button-vue"]):not(.app-menu-entry):hover {
+	color: var(--loglab-accent-orange) !important;
+}
+
+/* Formulários na área principal */
+#content input[type="text"],
+#content input[type="search"],
+#content input[type="email"],
+#content input[type="password"],
+#content input[type="number"],
+#content input[type="url"],
+#content input[type="date"],
+#content input[type="datetime-local"],
+#content select,
+#content textarea {
+	background: var(--loglab-content-input-bg) !important;
+	border: 1px solid var(--loglab-content-input-border) !important;
+	border-radius: var(--loglab-radius) !important;
+	color: rgba(33, 37, 41, 0.9) !important;
+}
+
+#content input::placeholder,
+#content textarea::placeholder {
+	color: var(--loglab-content-placeholder) !important;
+}
+
+#content label,
+#content .label,
+#content legend {
+	color: rgba(33, 37, 41, 0.75) !important;
+}
+
+#content table,
+#content th,
+#content td {
+	color: rgba(33, 37, 41, 0.75) !important;
+	border-color: var(--loglab-content-card-border) !important;
+}
+
+#content th {
+	color: var(--loglab-content-heading) !important;
+	background: rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Dashboard / widgets */
+#content [class*="dashboard"] h1,
+#content [class*="dashboard"] h2,
+#content [class*="Dashboard"] h1,
+#content [class*="Dashboard"] h2,
+#content [class*="widget"] h3,
+#content [class*="Widget"] h3 {
+	color: var(--loglab-content-heading) !important;
+}
+
+#content [class*="dashboard"] p,
+#content [class*="widget"] p {
+	color: rgba(33, 37, 41, 0.75) !important;
+}
+
+#content [class*="widget"] svg,
+#content [class*="Widget"] svg,
+#content [class*="dashboard"] svg {
+	color: var(--loglab-accent) !important;
+	fill: var(--loglab-accent) !important;
+	opacity: 1 !important;
+}
+
+/* Dashboard em modo escuro: cartões escuros + nosso texto escuro no #content = ilegível */
+body#body-user.dashboard--dark #content [class*="DashboardWidget"] {
+	--color-main-text: rgba(255, 255, 255, 0.95) !important;
+	--color-text-maxcontrast: rgba(255, 255, 255, 0.88) !important;
+	color: rgba(255, 255, 255, 0.95) !important;
+}
+
+body#body-user.dashboard--dark #content [class*="DashboardWidget"] :where(p, span, h2, h3, h4, a, li, [class*="title"], [class*="subtitle"], [class*="empty"], [class*="name"]) {
+	color: rgba(255, 255, 255, 0.94) !important;
+}
+
+body#body-user.dashboard--dark #content [class*="DashboardWidget"] svg {
+	color: var(--loglab-accent) !important;
+	fill: var(--loglab-accent) !important;
+}
+
+/* Listas e linhas (Arquivos, etc.) */
+#content .files-list__row,
+#content [class*="list__row"],
+#content tr {
+	--color-main-text: rgba(33, 37, 41, 0.75);
+	--color-text-maxcontrast: rgba(33, 37, 41, 0.65);
+}
+
+/*
+ * Configurações (app-settings): coluna #app-navigation (Pessoal / Administração).
+ * Só .app-settings para não alterar #app-navigation de Arquivos etc.
+ */
+#content.app-settings #app-navigation {
+	background-color: #ffffff !important;
+	background: #ffffff !important;
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+	--color-main-text: rgba(33, 37, 41, 0.82) !important;
+	--color-text-maxcontrast: rgba(33, 37, 41, 0.72) !important;
+	--color-text-maxcontrast-background-blur: rgba(33, 37, 41, 0.72) !important;
+	--color-main-background: #ffffff !important;
+	--color-main-background-blur: #ffffff !important;
+	--color-background-hover: rgba(0, 0, 0, 0.06) !important;
+	color: rgba(33, 37, 41, 0.8) !important;
+	border-inline-end: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+#content.app-settings #app-navigation .app-navigation-caption {
+	color: rgba(33, 37, 41, 0.55) !important;
+}
+
+#content.app-settings #app-navigation a,
+#content.app-settings #app-navigation a span,
+#content.app-settings #app-navigation .no-icon {
+	color: rgba(33, 37, 41, 0.82) !important;
+}
+
+#content.app-settings #app-navigation li:not(.active) > a:hover,
+#content.app-settings #app-navigation li:not(.active) > a:focus {
+	background-color: rgba(0, 0, 0, 0.06) !important;
+	color: rgba(33, 37, 41, 0.92) !important;
+}
+
+#content.app-settings #app-navigation li:not(.active) > a:hover span,
+#content.app-settings #app-navigation li:not(.active) > a:focus span {
+	color: rgba(33, 37, 41, 0.92) !important;
+}
+
+#content.app-settings #app-navigation li.active > a,
+#content.app-settings #app-navigation li.active > a span {
+	color: #1a1a1a !important;
+	font-weight: 600 !important;
+}
+
+#content.app-settings #app-navigation li.active > a {
+	background-color: var(--loglab-accent) !important;
+}
+
+#content.app-settings #app-navigation li.active > a:focus-visible {
+	outline: 2px solid rgba(33, 37, 41, 0.5) !important;
+	box-shadow: 0 0 0 2px #ffffff !important;
+}
+
+/*
+ * Ícones da lista são variantes “escuras” do NC (feitas para fundo escuro = traço claro).
+ * Sobre fundo branco parecem brancos; escurecemos para ficarem na mesma leitura do texto.
+ */
+#content.app-settings #app-navigation a img {
+	filter: brightness(0) saturate(100%) opacity(0.78) !important;
+}
+
+#content.app-settings #app-navigation li.active > a img {
+	filter: brightness(0) saturate(100%) opacity(0.95) !important;
+}
+
+#content.app-settings #app-navigation li:not(.active) > a:hover img,
+#content.app-settings #app-navigation li:not(.active) > a:focus img {
+	filter: brightness(0) saturate(100%) opacity(0.88) !important;
+}
+
+#content.app-settings #app-navigation a svg,
+#content.app-settings #app-navigation [class^="icon-"],
+#content.app-settings #app-navigation [class*=" icon-"] {
+	color: rgba(33, 37, 41, 0.82) !important;
+	fill: rgba(33, 37, 41, 0.82) !important;
+	opacity: 1 !important;
+}
+
+#content.app-settings #app-navigation li.active > a svg {
+	color: #1a1a1a !important;
+	fill: #1a1a1a !important;
+}
+
+/* Ajuste de ícones no header-end (notificações, etc.) */
+#header .header-end .icon,
+#header .header-end [class^="icon-"] {
+	color: rgba(255, 255, 255, 0.85) !important;
+}
+
+#header .header-end .icon:hover,
+#header .header-end [class^="icon-"]:hover {
+	color: var(--loglab-accent) !important;
+}
+
+/* Pesquisa unificada: ícone é Vue (material-design-icon / magnify-icon), não .icon — força amarelo como sino/contatos */
+#header .header-end #unified-search .material-design-icon,
+#header .header-end #unified-search .magnify-icon,
+#header .header-end #unified-search .material-design-icon__svg,
+#header .header-end #unified-search svg {
+	color: #f93 !important;
+	fill: #f93 !important;
+	opacity: 1 !important;
+	filter: none !important;
+}
+
+#header .header-end #unified-search .material-design-icon__svg path,
+#header .header-end #unified-search svg path {
+	fill: #f93 !important;
+}
+
+#header .header-end #unified-search button,
+#header .header-end #unified-search [role="button"] {
+	color: var(--loglab-accent) !important;
+}
+
+/* ---- Dropdown do menu do usuário e demais popovers do header: tema escuro ---- */
+/* Força fundo escuro em qualquer .menu/.popovermenu que venha do header */
+#header .header-end .menu,
+#header .header-end .popovermenu,
+#header .header-end > div > .menu,
+#header .header-end > div > .popovermenu,
+#header .header-end [class*="menu"] .menu,
+#header .header-end [class*="Menu"] .menu,
+#header .header-end .dropdown-menu,
+#header + [class*="menu"],
+#header ~ [class*="popover"],
+.header-end .menu.popovermenu,
+.header-end .popovermenu,
+#user-menu .menu,
+#user-menu .popovermenu,
+#user-menu [class*="menu"],
+#user-menu > div > .menu,
+#user-menu > div > .popovermenu {
+	/* background: var(--loglab-dark) !important; */
+	background-color: #30302e !important;
+	/* border: 1px solid rgba(255, 255, 255, 0.1) !important; */
+	/* border-radius: var(--loglab-radius) !important; */
+	/* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important; */
+}
+
+/* Dropdown renderizado via portal (Vue) - só quando for do user menu */
+[class*="UserMenu"] [class*="menu"],
+[class*="user-menu"] [class*="menu"] {
+	background: #18181b !important;
+	background-color: #18181b !important;
+}
+
+/*
+ * Menu da conta teleportado para o <body> (Floating Vue / v-popper).
+ * Fora do #user-menu, as regras antigas não pegam e o texto herda --color-main-text escuro do body → ilegível.
+ */
+body .v-popper__popper:has(a[href*="settings/user"]),
+body [class*="v-popper"]:has(a[href*="settings/user"]) {
+	--color-main-text: rgba(255, 255, 255, 0.96) !important;
+	--color-text-maxcontrast: rgba(255, 255, 255, 0.86) !important;
+	--color-main-background: #18181b !important;
+}
+
+body .v-popper__popper:has(a[href*="settings/user"]) .v-popper__inner,
+body [class*="v-popper"]:has(a[href*="settings/user"]) .v-popper__inner {
+	color: rgba(255, 255, 255, 0.96) !important;
+	background-color: #18181b !important;
+}
+
+body .v-popper__popper:has(a[href*="settings/user"]) .v-popper__inner a:not([href*="logout"]),
+body .v-popper__popper:has(a[href*="settings/user"]) .v-popper__inner button,
+body .v-popper__popper:has(a[href*="settings/user"]) .v-popper__inner [class*="list-item"],
+body .v-popper__popper:has(a[href*="settings/user"]) .v-popper__inner li,
+body .v-popper__popper:has(a[href*="settings/user"]) .v-popper__inner span,
+body .v-popper__popper:has(a[href*="settings/user"]) .v-popper__inner p,
+body .v-popper__popper:has(a[href*="settings/user"]) .v-popper__inner [class*="name"],
+body .v-popper__popper:has(a[href*="settings/user"]) .v-popper__inner [class*="details"],
+body .v-popper__popper:has(a[href*="settings/user"]) .v-popper__inner [class*="line-one"],
+body .v-popper__popper:has(a[href*="settings/user"]) .v-popper__inner [class*="line-two"],
+body .v-popper__popper:has(a[href*="settings/user"]) .v-popper__inner [class*="label"] {
+	color: rgba(255, 255, 255, 0.95) !important;
+}
+
+body .v-popper__popper:has(a[href*="settings/user"]) .v-popper__inner a[href*="logout"] {
+	color: var(--loglab-accent) !important;
+}
+
+body .v-popper__popper:has(a[href*="settings/user"]) .v-popper__inner svg {
+	color: var(--loglab-accent) !important;
+	fill: var(--loglab-accent) !important;
+	opacity: 1 !important;
+}
+
+/*
+ * Menu da conta (NC 33+): NcHeaderMenu id=user-menu, classe account-menu, lista ul.account-menu__list.
+ * O painel é teleportado para o body (Floating Vue) — não passa por #user-menu .menu.
+ * NcListItem usa --color-main-text; sem isto o texto fica escuro sobre fundo #18181b.
+ */
+body .v-popper__popper:has(ul.account-menu__list) {
+	--color-main-text: rgba(255, 255, 255, 0.95) !important;
+	--color-text-maxcontrast: rgba(255, 255, 255, 0.72) !important;
+	--color-text-maxcontrast-default: rgba(255, 255, 255, 0.72) !important;
+	--color-main-background: #18181b !important;
+}
+
+body .v-popper__popper:has(ul.account-menu__list) .v-popper__inner {
+	color: rgba(255, 255, 255, 0.95) !important;
+	background-color: #18181b !important;
+}
+
+/* Entradas NcListItem (nome, sublinha, detalhes) — exceto item ativo (fundo amarelo / primário). */
+body .v-popper__popper:has(ul.account-menu__list) .list-item__wrapper:not(.list-item__wrapper--active):not(.active) [class*="list-item-content__name"],
+body .v-popper__popper:has(ul.account-menu__list) .list-item__wrapper:not(.list-item__wrapper--active):not(.active) [class*="list-item-content__subname"],
+body .v-popper__popper:has(ul.account-menu__list) .list-item__wrapper:not(.list-item__wrapper--active):not(.active) [class*="list-item-content__details"],
+body .v-popper__popper:has(ul.account-menu__list) .list-item__wrapper:not(.list-item__wrapper--active):not(.active) [class*="list-item-details__"] {
+	color: rgba(255, 255, 255, 0.92) !important;
+}
+
+body .v-popper__popper:has(ul.account-menu__list) .v-popper__inner a[href*="logout"] {
+	color: var(--loglab-accent) !important;
+}
+
+body .v-popper__popper:has(ul.account-menu__list) .v-popper__inner a[href*="logout"] svg,
+body .v-popper__popper:has(ul.account-menu__list) .v-popper__inner a[href*="logout"] .material-design-icon,
+body .v-popper__popper:has(ul.account-menu__list) .v-popper__inner a[href*="logout"] svg path {
+	color: var(--loglab-accent) !important;
+	fill: var(--loglab-accent) !important;
+}
+
+body .v-popper__popper:has(ul.account-menu__list) .v-popper__inner .button-vue:not(.button-vue--vue-primary) {
+	color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Portais genéricos do header (NcHeaderMenu) — qualquer profundidade. Não usar [class*="account-menu"] (casa account-menu-entry). */
+body [class*="UserMenu"],
+body [class*="HeaderMenu"],
+body .account-menu,
+body #user-menu {
+	--color-main-text: rgba(255, 255, 255, 0.96) !important;
+	--color-text-maxcontrast: rgba(255, 255, 255, 0.86) !important;
+	color: rgba(255, 255, 255, 0.95) !important;
+}
+
+body [class*="UserMenu"] a:not([href*="logout"]),
+body [class*="UserMenu"] button,
+body [class*="UserMenu"] span,
+body [class*="UserMenu"] p,
+body [class*="HeaderMenu"] a:not([href*="logout"]),
+body [class*="HeaderMenu"] button,
+body [class*="HeaderMenu"] span,
+body #user-menu a:not([href*="logout"]),
+body #user-menu button,
+body #user-menu span {
+	color: rgba(255, 255, 255, 0.95) !important;
+}
+
+#header .header-end .menu ul,
+#header .header-end .menu li,
+#header .header-end .popovermenu ul,
+#header .header-end .popovermenu li,
+#header .header-end > div > .menu ul,
+#header .header-end > div > .menu li,
+#user-menu .menu ul,
+#user-menu .menu li,
+#user-menu .popovermenu ul,
+#user-menu .popovermenu li,
+.header-end .menu.popovermenu ul,
+.header-end .menu.popovermenu li {
+	background: transparent !important;
+	border: none !important;
+}
+
+#header .header-end .menu a,
+#header .header-end .menu button,
+#header .header-end .menu .menuitem,
+#header .header-end .popovermenu a,
+#header .header-end .popovermenu button,
+#header .header-end .popovermenu .menuitem,
+#header .header-end > div > .menu a,
+#header .header-end > div > .menu button,
+#header .header-end > div > .menu .menuitem,
+#user-menu .menu a,
+#user-menu .menu button,
+#user-menu .menu .menuitem,
+#user-menu .popovermenu a,
+#user-menu .popovermenu button,
+#user-menu .popovermenu .menuitem,
+.header-end .menu.popovermenu a,
+.header-end .menu.popovermenu button,
+.header-end .menu.popovermenu .menuitem {
+	color: rgba(255, 255, 255, 0.9) !important;
+	background: transparent !important;
+}
+
+#header .header-end .menu a:hover,
+#header .header-end .menu button:hover,
+#header .header-end .menu .menuitem:hover,
+#header .header-end .popovermenu a:hover,
+#header .header-end .popovermenu button:hover,
+#header .header-end .popovermenu .menuitem:hover,
+#user-menu .menu a:hover,
+#user-menu .menu button:hover,
+#user-menu .menu .menuitem:hover,
+#user-menu .popovermenu a:hover,
+#user-menu .popovermenu button:hover,
+#user-menu .popovermenu .menuitem:hover,
+.header-end .menu.popovermenu a:hover,
+.header-end .menu.popovermenu .menuitem:hover {
+	background: rgba(255, 255, 255, 0.08) !important;
+	color: #fff !important;
+}
+
+/* Sair (Logout) em amarelo no dropdown */
+#header .header-end .menu a[href*="logout"],
+#header .header-end .menu .menuitem[data-id="logout"],
+#header .header-end .popovermenu a[href*="logout"],
+#header .header-end .popovermenu .menuitem[data-id="logout"],
+#user-menu .menu a[href*="logout"],
+#user-menu .menu .menuitem[data-id="logout"],
+#user-menu .popovermenu a[href*="logout"],
+#user-menu .popovermenu .menuitem[data-id="logout"],
+.header-end .menu a[href*="logout"],
+.header-end .menu .menuitem:last-child a,
+.header-end .popovermenu .menuitem:last-child a {
+	color: var(--loglab-accent) !important;
+	font-weight: 600 !important;
+}
+
+.header-end .menu .menuitem:last-child a:hover,
+.header-end .popovermenu .menuitem:last-child a:hover {
+	color: var(--loglab-accent) !important;
+	background: rgba(255, 215, 0, 0.12) !important;
+}
+
+/* Texto e ícones dentro do dropdown (nome do usuário, "Visualizar perfil", etc.) */
+#header .header-end .menu .menuitem .menu-title,
+#header .header-end .menu .menuitem span,
+#header .header-end .popovermenu .menuitem .menu-title,
+#header .header-end .popovermenu .menuitem span,
+#user-menu .menu .menuitem .menu-title,
+#user-menu .menu .menuitem span,
+#user-menu .popovermenu .menuitem .menu-title,
+#user-menu .popovermenu .menuitem span {
+	color: rgba(255, 255, 255, 0.9) !important;
+}
+
+#header .header-end .menu .menuitem .menu-title__subline,
+#header .header-end .popovermenu .menuitem .menu-title__subline,
+#user-menu .menu .menuitem .menu-title__subline,
+#user-menu .popovermenu .menuitem .menu-title__subline {
+	color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Ícones no dropdown do usuário – todos em amarelo (accent) */
+#header .header-end .menu .icon,
+#header .header-end .popovermenu .icon,
+#user-menu .menu .icon,
+#user-menu .popovermenu .icon,
+.header-end .menu.popovermenu .icon,
+#header .header-end .menu .menuitem .icon,
+#header .header-end .popovermenu .menuitem .icon,
+#user-menu .menu .menuitem .icon,
+#user-menu .popovermenu .menuitem .icon,
+#header .header-end .menu [class^="icon-"],
+#header .header-end .popovermenu [class^="icon-"],
+#user-menu .menu [class^="icon-"],
+#user-menu .popovermenu [class^="icon-"],
+#header .header-end .menu .menuitem svg,
+#header .header-end .popovermenu .menuitem svg,
+#user-menu .menu .menuitem svg,
+#user-menu .popovermenu .menuitem svg,
+#header .header-end .menu svg,
+#header .header-end .popovermenu svg,
+#user-menu .menu svg,
+#user-menu .popovermenu svg {
+	color: var(--loglab-accent) !important;
+	fill: var(--loglab-accent) !important;
+	opacity: 1 !important;
+}
+
+/* Ícones como background ou mask – forçar amarelo */
+#header .header-end .menu .menuitem a[class*="icon"],
+#user-menu .menu .menuitem a[class*="icon"],
+#user-menu .popovermenu .menuitem a[class*="icon"] {
+	background-color: var(--loglab-accent) !important;
+	-webkit-mask-size: contain !important;
+	mask-size: contain !important;
+	-webkit-mask-repeat: no-repeat !important;
+	mask-repeat: no-repeat !important;
+	-webkit-mask-position: center !important;
+	mask-position: center !important;
+}
+#header .header-end .menu .menuitem a[class*="icon"]::before,
+#user-menu .menu .menuitem a[class*="icon"]::before {
+	color: var(--loglab-accent) !important;
+}
+
+/* Wrappers de ícone (NcIcon, etc.) no menu do usuário */
+#user-menu [class*="Icon"] svg,
+#user-menu [class*="icon"] svg,
+#user-menu .menuitem [class*="Icon"],
+#user-menu .menuitem [class*="icon"] {
+	color: var(--loglab-accent) !important;
+	fill: var(--loglab-accent) !important;
+}
+#user-menu .menuitem img {
+	opacity: 1 !important;
+}
+
+/* Setinha do popover (borda superior) */
+#header .header-end .menu::after,
+#header .header-end .popovermenu::after,
+#user-menu .menu::after,
+#user-menu .popovermenu::after {
+	border-bottom-color: #18181b !important;
+}
+
+/* ========== NOTIFICAÇÕES, CONTATOS E PESQUISA UNIFICADA – tema escuro ========== */
+/* Notificações (#notifications) – painel que abre ao clicar no sino */
+#notifications .menu,
+#notifications .popovermenu,
+#notifications > div > .menu,
+#notifications [class*="content"],
+#notifications [class*="panel"],
+#notifications [class*="dropdown"],
+#notifications [class*="Popover"] {
+	background: #18181b !important;
+	background-color: #18181b !important;
+	border: 1px solid rgba(255, 255, 255, 0.1) !important;
+	border-radius: var(--loglab-radius) !important;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+#notifications .menu *,
+#notifications .popovermenu *,
+#notifications [class*="content"] *,
+#notifications [class*="panel"] * {
+	color: rgba(255, 255, 255, 0.9) !important;
+}
+
+#notifications input,
+#notifications .emptycontent,
+#notifications [class*="empty"] {
+	background: transparent !important;
+	color: rgba(255, 255, 255, 0.7) !important;
+}
+
+#notifications .icon,
+#notifications svg {
+	color: #f93 !important;
+	fill: #f93 !important;
+	opacity: 1 !important;
+}
+
+/* Contatos (#contactsmenu) – dropdown ao clicar no ícone de contatos */
+#contactsmenu .menu,
+#contactsmenu .popovermenu,
+#contactsmenu > div > .menu,
+#contactsmenu [class*="content"],
+#contactsmenu [class*="popover"],
+#contactsmenu [class*="Popover"],
+.contactsmenu-popover {
+	background: #18181b !important;
+	background-color: #18181b !important;
+	border: 1px solid rgba(255, 255, 255, 0.1) !important;
+	border-radius: var(--loglab-radius) !important;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+#contactsmenu .menu input,
+#contactsmenu .popovermenu input,
+#contactsmenu input[type="text"],
+#contactsmenu input[type="search"] {
+	background: rgba(255, 255, 255, 0.08) !important;
+	border: 1px solid rgba(255, 255, 255, 0.15) !important;
+	color: #fff !important;
+}
+
+#contactsmenu .menu input::placeholder,
+#contactsmenu .popovermenu input::placeholder {
+	color: rgba(255, 255, 255, 0.5) !important;
+}
+
+#contactsmenu .menu a,
+#contactsmenu .menu span,
+#contactsmenu .popovermenu a,
+#contactsmenu .popovermenu span,
+#contactsmenu [class*="contact"] {
+	color: rgba(255, 255, 255, 0.9) !important;
+}
+
+#contactsmenu .menu a:hover,
+#contactsmenu .popovermenu a:hover {
+	background: rgba(255, 255, 255, 0.08) !important;
+	color: #fff !important;
+}
+
+#contactsmenu .icon,
+#contactsmenu svg {
+	color: #f93 !important;
+	fill: #f93 !important;
+}
+
+/* Pesquisa unificada – modal "Pesquisa unificada" */
+#unified-search [class*="modal"],
+#unified-search [class*="Modal"],
+#unified-search [class*="content"],
+#unified-search [class*="panel"],
+#unified-search [class*="dialog"],
+[class*="UnifiedSearch"] [class*="modal"],
+[class*="UnifiedSearch"] [class*="Modal"],
+[class*="UnifiedSearch"] [class*="content"],
+[class*="unified-search"] [class*="content"],
+[class*="UnifiedSearch"] [class*="panel"] {
+	/* background: #18181b !important; */
+	/* background-color: #18181b !important; */
+	/* border: 1px solid rgba(255, 255, 255, 0.1) !important; */
+	border-radius: var(--loglab-radius-lg) !important;
+	/* box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important; */
+}
+
+#unified-search [class*="modal"] *,
+#unified-search [class*="content"] *,
+#unified-search [class*="panel"] *,
+[class*="UnifiedSearch"] [class*="modal"] *,
+[class*="UnifiedSearch"] [class*="content"] *,
+[class*="UnifiedSearch"] [class*="panel"] * {
+	color: rgba(255, 255, 255, 0.9) !important;
+}
+
+#unified-search input,
+#unified-search [class*="modal"] input,
+[class*="UnifiedSearch"] input {
+	background: rgba(255, 255, 255, 0.08) !important;
+	border: 1px solid rgba(255, 255, 255, 0.15) !important;
+	color: #fff !important;
+}
+
+#unified-search input::placeholder,
+[class*="UnifiedSearch"] input::placeholder {
+	color: rgba(255, 255, 255, 0.5) !important;
+}
+
+#unified-search h2,
+#unified-search h3,
+[class*="UnifiedSearch"] h2,
+[class*="UnifiedSearch"] h3 {
+	color: #fff !important;
+}
+
+#unified-search .icon,
+#unified-search svg,
+[class*="UnifiedSearch"] .icon,
+[class*="UnifiedSearch"] svg {
+	color: #f93 !important;
+	fill: #f93 !important;
+	opacity: 1 !important;
+}
+
+/* Popovers/portals do Vue no body (só dos componentes do header) */
+body > [class*="Notification"],
+body > [class*="UnifiedSearch"],
+body > [class*="ContactsMenu"],
+body > [class*="ContactsPopup"] {
+	background: #18181b !important;
+	background-color: #18181b !important;
+	border: 1px solid rgba(255, 255, 255, 0.1) !important;
+	border-radius: var(--loglab-radius) !important;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+body > [class*="Notification"] *,
+body > [class*="UnifiedSearch"] *,
+body > [class*="ContactsMenu"] *,
+body > [class*="ContactsPopup"] * {
+	color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body > [class*="Notification"] input,
+body > [class*="UnifiedSearch"] input,
+body > [class*="ContactsMenu"] input,
+body > [class*="ContactsPopup"] input {
+	background: rgba(255, 255, 255, 0.08) !important;
+	border: 1px solid rgba(255, 255, 255, 0.15) !important;
+	color: #fff !important;
+}
+
+body > [class*="Notification"] input::placeholder,
+body > [class*="UnifiedSearch"] input::placeholder,
+body > [class*="ContactsMenu"] input::placeholder {
+	color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* First run wizard (modal pós-login): fundo claro + texto claro = ilegível com tema escuro */
+.first-run-wizard {
+	--color-main-background: #121214;
+	--color-main-text: #f4f4f6;
+	--color-text-maxcontrast: #b8b8c0;
+	--color-background-hover: rgba(255, 255, 255, 0.08);
+}
+
+.first-run-wizard .modal-wrapper .modal-container {
+	background-color: #121214 !important;
+	color: #f4f4f6 !important;
+	box-shadow: 0 0 40px rgba(0, 0, 0, 0.65) !important;
+}
+
+.first-run-wizard .modal-container__content {
+	color: #f4f4f6 !important;
+}
+
+/* Módulos Vue com hash (firstrunwizard) — força contraste se o tema deixar texto claro */
+.first-run-wizard .modal-container__content [class*="_heading_"],
+.first-run-wizard .modal-container__content [class*="_subtitle_"],
+.first-run-wizard .modal-container__content [class*="_text_"] {
+	color: #f4f4f6 !important;
+}
+
+.first-run-wizard .modal-container__content [class*="_version_"] {
+	color: #b8b8c0 !important;
+}
+
+.first-run-wizard .modal-container__content a:not(.button-vue):not([class*="button-vue"]) {
+	color: var(--loglab-accent, #facc15) !important;
+}
+
+.first-run-wizard .modal-container__content .icon-vue svg,
+.first-run-wizard .modal-container__content svg {
+	fill: currentColor !important;
+	opacity: 1 !important;
+}
+
+/*
+ * Último reforço: NcAppNavigation (Vue) carrega CSS com .app-navigation[data-v-…] depois do tema.
+ * Especificidade maior (#content.app-settings) + mesmas declarações garantem fundo sólido e sem blur.
+ */
+#content.app-settings > .app-navigation,
+#content[class*="app-"] > .app-navigation {
+	--color-main-background: var(--loglab-dark) !important;
+	--color-main-background-blur: var(--loglab-dark) !important;
+	--color-main-text: rgba(255, 255, 255, 0.9) !important;
+	--color-text-maxcontrast: rgba(255, 255, 255, 0.55) !important;
+	--color-text-maxcontrast-default: rgba(255, 255, 255, 0.55) !important;
+	--color-text-maxcontrast-background-blur: rgba(255, 255, 255, 0.55) !important;
+	background-color: var(--loglab-dark) !important;
+	background-image: none !important;
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+}
+
+.panel {
+	background: #e9ecef !important;
+	border: 1px solid rgba(48, 48, 46, 0.2) !important;
+	color:#30302e !important
+}
+
+.panel>.panel--header>h2 span  {
+	color: #30302e !important;
+}
+
+/* Ícones dos cards do dashboard ("Arquivos sugeridos", etc.) */
+.panel .panel--header .icon,
+.panel .panel--header [class^="icon-"],
+.panel .panel--header [class*=" icon-"],
+.panel .panel--header svg,
+.panel .panel--header svg path {
+	/* color: #111111 !important; */
+	fill: #111111 !important;
+	opacity: 1 !important;
+	filter: none !important;
+}
+
+/* Alguns ícones do Nextcloud são desenhados em ::before com mask/background + invert var */
+.panel .panel--header {
+	--background-invert-if-dark: none !important;
+	--primary-invert-if-dark: none !important;
+}
+
+.panel .panel--header h2 > span[class*="icon-"]::before,
+.panel .panel--header h2 > span[class*="icon-"]::after,
+.panel .panel--header [class*="icon-"]::before,
+.panel .panel--header [class*="icon-"]::after {
+	color: #111111 !important;
+	background-color: #111111 !important;
+	fill: #111111 !important;
+	opacity: 1 !important;
+	filter: none !important;
+	-webkit-filter: none !important;
+}
+
+/* Nextcloud pode inverter --icon-*-dark em runtime; fixa o ícone do card em preto real */
+.panel .panel--header .icon-files-dark {
+	background-image: var(--original-icon-files-dark) !important;
+	filter: none !important;
+	-webkit-filter: none !important;
+}
+
+/*
+ * Sidebar PHP usa #app-navigation (sem classe .app-navigation). Só elementos com classe .app-navigation são Vue.
+ */
+body[data-themes] .app-navigation {
+	--color-main-background: var(--loglab-dark) !important;
+	--color-main-background-blur: var(--loglab-dark) !important;
+	--color-main-text: rgba(255, 255, 255, 0.9) !important;
+	--color-text-maxcontrast: rgba(255, 255, 255, 0.55) !important;
+	--color-text-maxcontrast-default: rgba(255, 255, 255, 0.55) !important;
+	--color-text-maxcontrast-background-blur: rgba(255, 255, 255, 0.55) !important;
+	background-color: var(--loglab-dark) !important;
+	background-image: none !important;
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+	color: rgba(255, 255, 255, 0.9) !important;
+	border-inline-end: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Menu da conta: remover ícones e usar bolinha estilo "Definir status" */
+#user-menu .account-menu-entry__icon,
+#user-menu .account-menu-entry .icon,
+#user-menu .account-menu-entry svg,
+#user-menu .account-menu-entry [class^="icon-"],
+#user-menu .account-menu-entry [class*=" icon-"],
+.header-menu__user-menu .account-menu-entry__icon,
+.header-menu__user-menu .account-menu-entry .icon,
+.header-menu__user-menu .account-menu-entry svg,
+.header-menu__user-menu .account-menu-entry [class^="icon-"],
+.header-menu__user-menu .account-menu-entry [class*=" icon-"],
+body .v-popper__popper .account-menu-entry__icon,
+body .v-popper__popper .account-menu-entry .icon,
+body .v-popper__popper .account-menu-entry svg,
+body .v-popper__popper .account-menu-entry [class^="icon-"],
+body .v-popper__popper .account-menu-entry [class*=" icon-"] {
+	display: none !important;
+}
+
+#user-menu .account-menu-entry .list-item__anchor,
+.header-menu__user-menu .account-menu-entry .list-item__anchor,
+body .v-popper__popper .account-menu-entry .list-item__anchor {
+	position: relative !important;
+	padding-inline-start: 28px !important;
+}
+
+#user-menu .account-menu-entry .list-item__anchor::before,
+.header-menu__user-menu .account-menu-entry .list-item__anchor::before,
+body .v-popper__popper .account-menu-entry .list-item__anchor::before {
+	content: "" !important;
+	position: absolute !important;
+	inset-inline-start: 8px !important;
+	top: 50% !important;
+	width: 12px !important;
+	height: 12px !important;
+	border: 2px solid rgba(255, 255, 255, 0.72) !important;
+	border-radius: 50% !important;
+	background: transparent !important;
+	transform: translateY(-50%) !important;
+	box-sizing: border-box !important;
+}
