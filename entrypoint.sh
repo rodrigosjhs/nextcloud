@@ -11,7 +11,7 @@ if [ -f /var/www/html/config/config.php ]; then
     echo "Configurando trusted domains..."
 
     sudo -u www-data php occ config:system:set trusted_domains 0 --value="localhost" || true
-    sudo -u www-data php occ config:system:set trusted_domains 1 --value="cloud.seudominio.com" || true
+    sudo -u www-data php occ config:system:set trusted_domains 1 --value="intranet.loglabprojetos.com.br" || true
 
     echo "Ativando tema Loglab..."
 
