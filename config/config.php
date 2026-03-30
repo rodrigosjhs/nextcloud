@@ -18,4 +18,7 @@ $CONFIG = array (
   'dbuser' => 'yumit-mariadb-prd',
   'dbpassword' => 'll@2025#!',
   'installed' => true,
+  'loglab_auth_login_url' => 'https://infra.loglabprojetos.com.br/microsservices/auth/login',
+  'mysql.utf8mb4' => true,
+  'debug' => true,
 );
