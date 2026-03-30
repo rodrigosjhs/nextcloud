@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ${JOB_NAME}
+  namespace: intranet
+  annotations:
+    # Remove o limite de tamanho do corpo da requisição (essencial para o 413)
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+
+    # Aumenta os timeouts (gravações longas demoram para serem processadas no upload)
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+
+    # Opcional: Se estiver usando buffering pesado, pode causar erros em uploads gigantes
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "intranet.loglabprojetos.com.br"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ${JOB_NAME}
+                port:
+                  number: 80

@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${JOB_NAME}
+  namespace: intranet
+  annotations:
+    kubernetes.io/change-cause: "Deploy automático via Jenkins - build ${BUILD_NUMBER}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${JOB_NAME}
+  template:
+    metadata:
+      labels:
+        app: ${JOB_NAME}
+    spec:
+      imagePullSecrets:
+        - name: repository-service
+      tolerations:
+        - key: "environment"
+          operator: "Equal"
+          value: "prd"
+          effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "kubernetes.io/hostname"
+                    operator: In
+                    values:
+                      - work4-prd
+      containers:
+        - name: ${JOB_NAME}
+          image: repository-service.loglabprojetos.com.br/docker-service/${JOB_NAME}:v.${BUILD_NUMBER}.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: NC_default_phone_region
+              value: "BR"
+            - name: NC_maintenance_window_start
+              value: "1"
+            - name: NC_memcache_locking
+              value: '\OC\Memcache\APCu'
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "3Gi"
+              cpu: "2"
+          volumeMounts:
+            - name: ${JOB_NAME}
+              mountPath: /var/www/html
+      volumes:
+        - name: ${JOB_NAME}
+          persistentVolumeClaim:
+            claimName: ${JOB_NAME}
