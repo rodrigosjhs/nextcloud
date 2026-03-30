@@ -1,8 +1,21 @@
----
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: ${JOB_NAME}
+#   namespace: intranet
+# spec:
+#   accessModes:
+#     - ReadWriteMany
+#   storageClassName: nfs2-csi-prd
+#   resources:
+#     requests:
+#       storage: 150Gi
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ${JOB_NAME}
+  name: nextcloud-data
   namespace: intranet
 spec:
   accessModes:
@@ -10,4 +23,17 @@ spec:
   storageClassName: nfs2-csi-prd
   resources:
     requests:
-      storage: 150Gi
+      storage: 50Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-config
+  namespace: intranet
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs2-csi-prd
+  resources:
+    requests:
+      storage: 5Gi
