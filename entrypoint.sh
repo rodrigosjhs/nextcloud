@@ -42,13 +42,6 @@ if [ -f "$CONFIG_FILE" ]; then
     echo "Configurando SSO Loglab..."
     occ config:system:set loglab_auth_login_url --value="https://infra.loglabprojetos.com.br/microsservices/auth/login" || true
 
-    echo "Configurações recomendadas..."
-    occ config:system:set default_phone_region --value="BR" || true
-    occ config:system:set maintenance_window_start --value="1" || true
-
-    echo "Configurando CSP customizado..."
-    occ config:system:set custom_csp_policy --value="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://intranet.loglabprojetos.com.br; style-src 'self' 'unsafe-inline' https://intranet.loglabprojetos.com.br; img-src * data: blob:;" || true
-
     echo "Ativando tema Loglab..."
     occ app:enable loglab_theme || true
 
