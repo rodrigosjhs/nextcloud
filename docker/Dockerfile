@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     vim \
     sudo \
-    netcat \
+    netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
 # configurar GD
