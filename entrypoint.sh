@@ -45,6 +45,16 @@ if [ -f "$CONFIG_FILE" ]; then
     echo "Configurações recomendadas..."
     occ config:system:set default_phone_region --value="BR" || true
     occ config:system:set maintenance_window_start --value="1" || true
+    occ config:system:set trashbin_retention_obligation --value="auto, 7" || true
+
+    echo "Configurando cache e locking..."
+
+    occ config:system:set memcache.local --value="\\OC\\Memcache\\APCu" || true
+    occ config:system:set memcache.locking --value="\\OC\\Memcache\\Redis" || true
+    occ config:system:set memcache.distributed --value="\\OC\\Memcache\\Redis" || true
+
+    occ config:system:set redis host --value="redis-service.tools.svc.cluster.local" || true
+    occ config:system:set redis port --value="6379" --type=integer || true
 
     echo "Ativando tema Loglab..."
     occ app:enable loglab_theme || true
