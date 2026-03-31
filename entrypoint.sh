@@ -1,10 +1,6 @@
 #!/bin/bash
 set -e
 
-echo "Iniciando Apache..."
-apache2-foreground &
-APACHE_PID=$!
-
 CONFIG_FILE="/var/www/html/config/config.php"
 
 echo "Aguardando Nextcloud inicializar..."
@@ -18,7 +14,7 @@ for i in {1..60}; do
 done
 
 occ() {
-    sudo -u www-data php /var/www/html/occ "$@"
+    su -s /bin/bash www-data -c "php /var/www/html/occ $*"
 }
 
 if [ -f "$CONFIG_FILE" ]; then
@@ -52,6 +48,5 @@ else
     echo "config.php não encontrado."
 fi
 
-echo "Nextcloud configurado."
-
-wait $APACHE_PID
+echo "Iniciando Apache..."
+exec apache2-foreground
