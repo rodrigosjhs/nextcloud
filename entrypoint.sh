@@ -3,7 +3,11 @@ set -e
 
 CONFIG_FILE="/var/www/html/config/config.php"
 
-echo "Aguardando Nextcloud inicializar..."
+occ() {
+    su -s /bin/bash www-data -c "php /var/www/html/occ $*"
+}
+
+echo "Aguardando config.php do Nextcloud..."
 
 for i in {1..60}; do
     if [ -f "$CONFIG_FILE" ]; then
@@ -12,10 +16,6 @@ for i in {1..60}; do
     fi
     sleep 2
 done
-
-occ() {
-    su -s /bin/bash www-data -c "php /var/www/html/occ $*"
-}
 
 if [ -f "$CONFIG_FILE" ]; then
 
@@ -38,11 +38,22 @@ if [ -f "$CONFIG_FILE" ]; then
     echo "Configurando SSO Loglab..."
     occ config:system:set loglab_auth_login_url --value="https://infra.loglabprojetos.com.br/microsservices/auth/login" || true
 
+    echo "Configurando cache APCu..."
+    occ config:system:set memcache.local --value="\\OC\\Memcache\\APCu" || true
+
+    echo "Configurando Redis..."
+    occ config:system:set memcache.locking --value="\\OC\\Memcache\\Redis" || true
+    occ config:system:set redis host --value="redis.hpb.svc.cluster.local" || true
+    occ config:system:set redis port --value="6379" --type=integer || true
+
     echo "Ativando tema Loglab..."
     occ app:enable loglab_theme || true
 
     echo "Apps Loglab instalados:"
     occ app:list | grep loglab || true
+
+    echo "Removendo config.php.custom se existir..."
+    rm -f /var/www/html/config/config.php.custom || true
 
 else
     echo "config.php não encontrado."
